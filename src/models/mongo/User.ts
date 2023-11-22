@@ -13,6 +13,7 @@ export let UserSchema = new Schema<IUser>({
     default: LoginType.LINE,
     required: true,
   },
+  thirdPartyUid: { type: String },
   photoUrl: { type: String },
   createTime: { type: Number, required: true },
 });
