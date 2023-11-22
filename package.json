@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "NODE_ENV=dev npx nodemon index.ts",
+    "dev": "NODE_ENV=dev npx nodemon src/index.ts",
     "build": "tsc",
     "start": "NODE_ENV=prod node dist/index.js"
   },
