@@ -1,17 +1,23 @@
 import express, { Express, Request, Response, json, urlencoded } from "express";
+import helmet from 'helmet';
+import morgan from 'morgan';
 
 import env from "./utils/env";
 import { initMongoDB } from "./utils/mongo";
 import AuthRouter from "./routes/auth";
 import LungRouter from "./routes/lung";
 import AuthMiddleware from "./middlewares/AuthMiddleware";
+import { initSentry } from "./utils/sentry";
 
 const port = env.port;
 const app: Express = express();
 
-app.use(urlencoded({ extended: false }));
 app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(helmet());
+app.use(morgan('dev'));
 
+initSentry(app);
 initMongoDB();
 
 const prefix = "/api";

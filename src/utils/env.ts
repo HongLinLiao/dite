@@ -16,6 +16,7 @@ const env: Env = {
   lineClientSecret: process.env.LINE_CLIENT_SECRET || "",
   lineRedirectUri: process.env.LINE_REDIRECT_URI || "",
   jwtSecret: process.env.JWT_SECRET || "",
+  sentryUri: process.env.SENTRY_URI || "",
 };
 
 type Env = {
@@ -26,6 +27,7 @@ type Env = {
   lineClientSecret: string;
   lineRedirectUri: string;
   jwtSecret: string;
+  sentryUri: string;
 };
 
 type Environment = "LOCAL" | "DEV" | "PROD";
