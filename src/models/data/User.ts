@@ -5,6 +5,7 @@ export default interface IUser {
   name: string;
   email: string;
   loginType: LoginType;
+  thirdPartyUid?: string;
   photoUrl?: string;
   createTime: number;
 }
