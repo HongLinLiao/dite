@@ -1,3 +1,3 @@
 export enum LoginType {
-  LINE = 1,
+    LINE = 1,
 }

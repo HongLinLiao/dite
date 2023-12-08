@@ -1,34 +1,44 @@
 {
-  "name": "dite",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.ts",
-  "scripts": {
-    "dev": "npx nodemon src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
-  "author": "Leo Liao",
-  "license": "ISC",
-  "dependencies": {
-    "@sentry/node": "^7.81.1",
-    "@sentry/profiling-node": "^1.2.6",
-    "axios": "^1.6.2",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.1",
-    "morgan": "^1.10.0",
-    "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/morgan": "^1.9.9",
-    "@types/node": "^18.11.13",
-    "@types/uuid": "^9.0.7",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
-  }
+    "name": "dite",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.ts",
+    "scripts": {
+        "style:check": "prettier --check src/**/*",
+        "style:fix": "prettier --write src/**/*",
+        "lint:check": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "dev": "npx nodemon src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "author": "Leo Liao",
+    "license": "ISC",
+    "dependencies": {
+        "@sentry/node": "^7.81.1",
+        "@sentry/profiling-node": "^1.2.6",
+        "axios": "^1.6.2",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "helmet": "^7.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.0.1",
+        "morgan": "^1.10.0",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/jsonwebtoken": "^9.0.5",
+        "@types/morgan": "^1.9.9",
+        "@types/node": "^18.11.13",
+        "@types/uuid": "^9.0.7",
+        "@typescript-eslint/eslint-plugin": "^6.13.2",
+        "@typescript-eslint/parser": "^6.13.2",
+        "eslint": "^8.55.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.0.1",
+        "prettier": "^3.1.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.4"
+    }
 }
