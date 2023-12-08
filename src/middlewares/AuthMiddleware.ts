@@ -7,8 +7,6 @@ export default function AuthMiddleware(
   next: NextFunction
 ) {
   try {
-    console.log('test');
-    
     const { authorization } = req.headers;
     verify(authorization?.split(" ")[1] ?? "");
     next();
