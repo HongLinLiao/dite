@@ -1,6 +1,7 @@
 import { LoginType } from '../enums/LoginType';
 import { JwtField, ThirdPartyJwtInfo, issueToken, verifyToken } from '../utils/jwt';
 import { getOAuthEndpoint, getToken, getUserProfile, verifyIdToken } from '../utils/line';
+import { BadRequestError } from '../utils/response';
 import { createUser, queryUserByThirdParty } from './user';
 
 export async function lineLogin(code: string): Promise<ThirdPartyJwtInfo> {
@@ -8,7 +9,7 @@ export async function lineLogin(code: string): Promise<ThirdPartyJwtInfo> {
     const profile = await getUserProfile(tokenData.access_token);
 
     if (!tokenData.id_token) {
-        throw new Error('LINE Login Error!');
+        throw new BadRequestError('LINE id token not found');
     }
 
     const jwtInfo = await verifyIdToken(tokenData.id_token);
@@ -51,8 +52,7 @@ export async function login(thirdPartyInfo: ThirdPartyJwtInfo): Promise<string> 
 }
 
 export function authentication(token: string) {
-    const tokenData = verifyToken(token);
-    return tokenData;
+    return verifyToken(token);
 }
 
 export function getLineEndpoint(): string {

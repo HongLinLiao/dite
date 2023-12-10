@@ -1,38 +1,41 @@
 name: CI Flow
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
-  pull_request:
-    branches:
-      - 'main'
+    workflow_dispatch:
+    push:
+        branches:
+            - 'main'
+    pull_request:
+        branches:
+            - 'main'
 
 jobs:
-  CI-Stage:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    CI-Stage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Yarn Cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'yarn'
+            - name: Yarn Cache
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'yarn'
 
-      - name: Install Package
-        run: yarn install
+            - name: Install Package
+              run: yarn install
 
-      - name: Build
-        run: yarn build
+            - name: Lint
+              run: yarn lint:check
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        with:
-          name: artifact
-          path: |
-            .
-            !node_modules
+            - name: Build
+              run: yarn build
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+              with:
+                  name: artifact
+                  path: |
+                      .
+                      !node_modules

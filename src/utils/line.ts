@@ -77,6 +77,26 @@ export async function verifyIdToken(idToken: string, nonce?: string, userId?: st
     return res.data as LINEJWTVerify;
 }
 
+// export async function refreshToken(token: string): Promise<LINEOAuth> {
+//     const { lineClientId, lineClientSecret } = env;
+
+//     const res = await axios.request({
+//         url: `${LINE_OAUTH_ENDPOINT}/token`,
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': REQUEST_CONTENT_TYPE,
+//         },
+//         data: {
+//             grant_type: 'refresh_token',
+//             refresh_token: token,
+//             client_id: lineClientId,
+//             client_secret: lineClientSecret,
+//         },
+//     });
+
+//     return res.data as LINEOAuth;
+// }
+
 export async function getUserProfile(accessToken: string) {
     const res = await axios.request({
         method: 'GET',

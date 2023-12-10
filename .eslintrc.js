@@ -20,6 +20,5 @@ module.exports = {
     "no-multiple-empty-lines": "error",
     'prefer-const': 'error',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
   },
 };

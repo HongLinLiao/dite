@@ -1,8 +1,9 @@
 import { Router, Request, Response } from 'express';
 
-import { getLineEndpoint, lineLogin, login } from '../services/auth';
+import { getLineEndpoint, lineLogin, login, authentication as verify } from '../services/auth';
 import { LoginType } from '../enums/LoginType';
 import AuthMiddleware from '../middlewares/AuthMiddleware';
+import { BadRequestError } from '../utils/response';
 
 const AuthRouter = Router();
 
@@ -17,18 +18,18 @@ AuthRouter.post('/signIn', async (req: Request, res: Response) => {
             break;
         }
         default: {
-            throw new Error('Invalid Login Agent!');
+            throw new BadRequestError('Invalid login agent');
         }
     }
 });
 
 AuthRouter.post('/', AuthMiddleware, async (req: Request, res: Response) => {
-    res.json({});
+    // TODO: refresh token or assign new token
+    res.sendStatus(200);
 });
 
 AuthRouter.get('/line/endpoint', (req: Request, res: Response) => {
-    const endpoint = getLineEndpoint();
-    res.send(endpoint);
+    res.send(getLineEndpoint());
 });
 
 export default AuthRouter;

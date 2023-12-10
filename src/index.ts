@@ -6,6 +6,7 @@ import env from './utils/env';
 import { initMongoDB } from './utils/mongo';
 import AuthRouter from './routes/auth';
 import LungRouter from './routes/lung';
+import ErrorMiddleware from './middlewares/ErrorMiddleware';
 import AuthMiddleware from './middlewares/AuthMiddleware';
 import { initSentry } from './utils/sentry';
 
@@ -27,6 +28,8 @@ app.use(`${prefix}/lung`, [AuthMiddleware], LungRouter);
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello world!');
 });
+
+app.use(ErrorMiddleware);
 
 app.listen(port, () => {
     console.log(`🚀 ${env.environment} Server is running at http://localhost:${port}`);

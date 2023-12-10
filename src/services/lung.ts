@@ -1,12 +1,13 @@
 import LungModel from '../models/mongo/Lung';
 import Lung from '../models/service/Lung';
+import { BadRequestError } from '../utils/response';
 import { queryUserById } from './user';
 
 export async function createLung(lung: Lung) {
     const user = await queryUserById(lung.uid);
 
     if (!user) {
-        throw new Error('User not exist!');
+        throw new BadRequestError('User not exist');
     }
 
     const newLung = await new LungModel({
@@ -23,13 +24,6 @@ export async function createLung(lung: Lung) {
 }
 
 export async function queryLungByUid(uid: string) {
-    const user = await queryUserById(uid);
-
-    if (!user) {
-        throw new Error('User not exist!');
-    }
-
     const lungs = await LungModel.find({ uid }).exec();
-
     return lungs.map((lung) => Lung.toServiceModel(lung));
 }
