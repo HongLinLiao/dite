@@ -6,8 +6,8 @@ import env from './utils/env';
 import { initMongoDB } from './utils/mongo';
 import AuthRouter from './routes/auth';
 import LungRouter from './routes/lung';
-import ErrorMiddleware from './middlewares/ErrorMiddleware';
-import AuthMiddleware from './middlewares/AuthMiddleware';
+import ErrorMiddleware from './middlewares/Error';
+import AuthMiddleware from './middlewares/Auth';
 import { initSentry } from './utils/sentry';
 
 const port = env.port;
