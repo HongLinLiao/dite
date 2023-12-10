@@ -1,18 +1,20 @@
 import { Router, Request, Response } from 'express';
 
 import { createLung, queryLungByUid } from '../services/lung';
+import { CreateLungRequest } from '../models/request/lung';
+import BodyValidator from '../middlewares/BodyValidator';
 
 const LungRouter = Router();
 
-LungRouter.post('/', async (req: Request, res: Response) => {
-    const { uid, year, month, day } = req.body;
+LungRouter.post('/', BodyValidator(CreateLungRequest), async (req: Request, res: Response) => {
+    const { uid, year, month, day, standardQuantity, packingQuantity } = req.body;
     const data = await createLung({
         uid,
         year,
         month,
         day,
-        standardQuantity: req.body.standardQuantity ?? null,
-        packingQuantity: req.body.packingQuantity ?? null,
+        standardQuantity: standardQuantity ?? null,
+        packingQuantity: packingQuantity ?? null,
         createTime: new Date().getTime(),
     });
     res.json(data);

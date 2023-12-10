@@ -5,7 +5,7 @@ export type ResponseError = {
 };
 
 export class BadRequestError extends Error implements ResponseError {
-    public name: string = 'BadRequestErrorError';
+    public name: string = 'BadRequestError';
     public status: number = 400;
 
     constructor(message: string) {

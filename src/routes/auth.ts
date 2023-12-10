@@ -1,13 +1,15 @@
 import { Router, Request, Response } from 'express';
 
-import { getLineEndpoint, lineLogin, login, authentication as verify } from '../services/auth';
+import { getLineEndpoint, lineLogin, login } from '../services/auth';
 import { LoginType } from '../enums/LoginType';
-import AuthMiddleware from '../middlewares/AuthMiddleware';
+import AuthMiddleware from '../middlewares/Auth';
 import { BadRequestError } from '../utils/response';
+import { SignInRequest } from '../models/request/auth';
+import BodyValidator from '../middlewares/BodyValidator';
 
 const AuthRouter = Router();
 
-AuthRouter.post('/signIn', async (req: Request, res: Response) => {
+AuthRouter.post('/signIn', BodyValidator(SignInRequest), async (req: Request, res: Response) => {
     const { code, loginType } = req.body;
 
     switch (loginType) {
