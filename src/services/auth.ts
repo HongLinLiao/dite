@@ -2,7 +2,7 @@ import { LoginType } from '../enums/LoginType';
 import { JwtField, ThirdPartyJwtInfo, issueToken, verifyToken } from '../utils/jwt';
 import { getOAuthEndpoint, getToken, getUserProfile, verifyIdToken } from '../utils/line';
 import { BadRequestError } from '../utils/response';
-import { createUser, queryUserByThirdParty } from './user';
+import { createUser, queryUserByThirdParty, updateUserById } from './user';
 
 export async function lineLogin(code: string): Promise<ThirdPartyJwtInfo> {
     const tokenData = await getToken(code);
@@ -37,7 +37,30 @@ export async function login(thirdPartyInfo: ThirdPartyJwtInfo): Promise<string> 
             createTime: new Date().getTime(),
         });
     } else {
-        // TODO: Check user data align
+        let diff = false;
+        if (user.name !== userName) {
+            diff = true;
+            user.name = userName;
+        }
+
+        if (user.email !== email) {
+            diff = true;
+            user.email = email;
+        }
+
+        if (user.photoUrl !== avatar) {
+            diff = true;
+            user.photoUrl = avatar;
+        }
+
+        if (diff) {
+            const newUser = await updateUserById(user);
+            if (!newUser) {
+                throw new BadRequestError('User not exist');
+            } else {
+                user = newUser;
+            }
+        }
     }
 
     const jwtInfo: JwtField = {

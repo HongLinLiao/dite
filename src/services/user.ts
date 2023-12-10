@@ -24,3 +24,8 @@ export async function createUser(user: User) {
 
     return User.toServiceModel(newUser);
 }
+
+export async function updateUserById(user: User) {
+    const newUser = await UserModel.findByIdAndUpdate(user.id, user).exec();
+    return newUser && User.toServiceModel(newUser);
+}
