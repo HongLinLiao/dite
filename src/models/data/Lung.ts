@@ -4,7 +4,7 @@ export default interface ILung {
     year: number;
     month: number;
     day: number;
-    standardQuantity?: number;
-    packingQuantity?: number;
+    standardQuantity: number | null;
+    packingQuantity: number | null;
     createTime: number;
 }

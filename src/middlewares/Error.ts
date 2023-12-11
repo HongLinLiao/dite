@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ResponseError, BadRequestError, UnauthorizedError } from '../utils/response';
+import { ResponseError, BadRequestError, UnauthorizedError, ForbiddenError, InternalServerError } from '../utils/response';
 
 export default function ErrorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
     let response: ResponseError;
 
-    if (err instanceof BadRequestError || err instanceof UnauthorizedError) {
+    if (err instanceof BadRequestError || err instanceof UnauthorizedError || err instanceof ForbiddenError || err instanceof InternalServerError) {
         response = {
             name: err.name,
             status: err.status,

@@ -5,7 +5,9 @@ import morgan from 'morgan';
 import env from './utils/env';
 import { initMongoDB } from './utils/mongo';
 import AuthRouter from './routes/auth';
+import GroupRouter from './routes/group';
 import LungRouter from './routes/lung';
+import NotifyRouter from './routes/notify';
 import ErrorMiddleware from './middlewares/Error';
 import AuthMiddleware from './middlewares/Auth';
 import { initSentry } from './utils/sentry';
@@ -23,6 +25,8 @@ initMongoDB();
 
 const prefix = '/api';
 app.use(`${prefix}/auth`, AuthRouter);
+app.use(`${prefix}/group`, [AuthMiddleware], GroupRouter);
+app.use(`${prefix}/notify`, [AuthMiddleware], NotifyRouter);
 app.use(`${prefix}/lung`, [AuthMiddleware], LungRouter);
 
 app.get('/', (req: Request, res: Response) => {

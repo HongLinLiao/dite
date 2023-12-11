@@ -1,9 +1,6 @@
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class CreateLungRequest {
-    @IsString()
-    uid: string;
-
     @IsInt()
     @Min(1911)
     @Max(2099)
