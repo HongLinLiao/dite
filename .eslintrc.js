@@ -12,8 +12,8 @@ module.exports = {
         node: true,
     },
     rules: {
+        'prettier/prettier': 'error',
         'no-var': 'error',
-        semi: 'error',
         indent: ['error', 4, { SwitchCase: 1, ignoredNodes: ['PropertyDefinition'] }],
         'no-multi-spaces': 'error',
         'space-in-parens': 'error',
