@@ -68,6 +68,33 @@ export async function queryGroupById(gid: string, options: { withMember: boolean
     return group;
 }
 
+export async function queryGroupByUid(uid: string, options: { withMember: boolean } = { withMember: false }): Promise<Group[]> {
+    let userGroup: Group[] = [];
+
+    const userSearch = await queryUserById(uid);
+    if (!userSearch) {
+        throw new BadRequestError('User not found');
+    }
+
+    const groupIds = (await RoleModel.find({ uid }).exec()).map((x) => x.gid);
+    if (groupIds.length) {
+        const searchGroup = await GroupModel.find({ _id: { $in: groupIds } }).exec();
+        userGroup = searchGroup.map((x) => Group.toServiceModel(x));
+    }
+
+    if (userGroup.length && options.withMember) {
+        const memberList = await queryMemberByGid(groupIds);
+        for (const group of userGroup) {
+            const members = memberList.filter((x) => x.gid === group.id);
+            if (members.length) {
+                group.member = members;
+            }
+        }
+    }
+
+    return userGroup;
+}
+
 export async function searchGroup(keyword: string, options: { withMember: boolean } = { withMember: true }): Promise<Group[]> {
     // TODO: Change to mongo util function
     const groupSearch = await GroupModel.find({

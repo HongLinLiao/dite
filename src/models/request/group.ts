@@ -17,16 +17,3 @@ export class SearchGroupRequest {
     @IsNotEmpty()
     keyword: string;
 }
-
-export class GroupInviteRequest {
-    @IsString()
-    @IsNotEmpty()
-    gid: string;
-
-    @IsString()
-    @IsNotEmpty()
-    uid: string;
-
-    @IsEnum(Role)
-    role: Role;
-}

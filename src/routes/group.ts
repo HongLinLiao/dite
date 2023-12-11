@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 
-import { createGroup, deleteGroup, inviteGroup, queryGroupById, searchGroup } from '../services/group';
+import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup } from '../services/group';
 import BodyValidator from '../middlewares/BodyValidator';
-import { CreateGroupRequest, GroupInviteRequest, SearchGroupRequest } from '../models/request/group';
+import { CreateGroupRequest, SearchGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
+import { InternalServerError } from '../utils/response';
 
 const GroupRouter = Router();
 
@@ -13,17 +14,14 @@ GroupRouter.get('/search', BodyValidator(SearchGroupRequest), async (req: Reques
     res.json(groups);
 });
 
+GroupRouter.get('/', async (req: Request, res: Response) => {
+    const { uid } = getCurrentUserFromRequest(req);
+    res.json(await queryGroupByUid(uid));
+});
+
 GroupRouter.get('/:gid', async (req: Request, res: Response) => {
     const { gid } = req.params;
     res.json(await queryGroupById(gid));
-});
-
-GroupRouter.post('/invite', BodyValidator(GroupInviteRequest), async (req: Request, res: Response) => {
-    const jwtInfo = getCurrentUserFromRequest(req);
-
-    const { gid, uid, role } = req.body as GroupInviteRequest;
-    const notification = await inviteGroup(jwtInfo.uid, uid, gid, role);
-    res.json(notification);
 });
 
 GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {
@@ -43,7 +41,7 @@ GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, re
     if (group) {
         res.json(group);
     } else {
-        throw new Error('Create group error');
+        throw new InternalServerError('Create group error');
     }
 });
 
