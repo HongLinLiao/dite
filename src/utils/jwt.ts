@@ -11,7 +11,7 @@ export function issueToken(data: JwtField): string {
     return jwt.sign(data, jwtSecret, { expiresIn, issuer });
 }
 
-export function verifyToken(token: string): JwtInfo | null {
+export function verifyToken(token: string): JwtInfo {
     const { jwtSecret } = env;
     return jwt.verify(token, jwtSecret, { issuer }) as JwtInfo;
 }

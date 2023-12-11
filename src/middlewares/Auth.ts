@@ -4,10 +4,14 @@ import { authentication as verify } from '../services/auth';
 import { UnauthorizedError } from '../utils/response';
 
 export default function AuthMiddleware(req: Request, res: Response, next: NextFunction) {
+    getCurrentUserFromRequest(req);
+    next();
+}
+
+export function getCurrentUserFromRequest(req: Request) {
     try {
         const { authorization } = req.headers;
-        verify(authorization?.split(' ')[1] ?? '');
-        next();
+        return verify(authorization?.split(' ')[1] ?? '');
     } catch (e) {
         throw new UnauthorizedError(String(e));
     }

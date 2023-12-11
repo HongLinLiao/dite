@@ -21,3 +21,12 @@ export class UnauthorizedError extends Error implements ResponseError {
         super(message);
     }
 }
+
+export class ForbiddenError extends Error implements ResponseError {
+    public name: string = 'ForbiddenError';
+    public status: number = 403;
+
+    constructor(message: string = 'Forbidden') {
+        super(message);
+    }
+}

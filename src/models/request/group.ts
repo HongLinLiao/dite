@@ -1,7 +1,10 @@
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
+import { Role } from '../../enums/Role';
 
 export class CreateGroupRequest {
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsOptional()
@@ -11,6 +14,19 @@ export class CreateGroupRequest {
 
 export class SearchGroupRequest {
     @IsString()
-    @Length(1)
+    @IsNotEmpty()
     keyword: string;
+}
+
+export class GroupInviteRequest {
+    @IsString()
+    @IsNotEmpty()
+    gid: string;
+
+    @IsString()
+    @IsNotEmpty()
+    uid: string;
+
+    @IsEnum(Role)
+    role: Role;
 }

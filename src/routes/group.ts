@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 
-import { authentication as verify } from '../services/auth';
-import { createGroup, deleteGroup, queryGroupById, searchGroup } from '../services/group';
-import { UnauthorizedError } from '../utils/response';
+import { createGroup, deleteGroup, inviteGroup, queryGroupById, searchGroup } from '../services/group';
 import BodyValidator from '../middlewares/BodyValidator';
-import { CreateGroupRequest, SearchGroupRequest } from '../models/request/group';
+import { CreateGroupRequest, GroupInviteRequest, SearchGroupRequest } from '../models/request/group';
+import { getCurrentUserFromRequest } from '../middlewares/Auth';
 
 const GroupRouter = Router();
 
@@ -19,13 +18,16 @@ GroupRouter.get('/:gid', async (req: Request, res: Response) => {
     res.json(await queryGroupById(gid));
 });
 
-GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {
-    const { authorization } = req.headers;
-    const jwtInfo = verify(authorization?.split(' ')[1] ?? '');
+GroupRouter.post('/invite', BodyValidator(GroupInviteRequest), async (req: Request, res: Response) => {
+    const jwtInfo = getCurrentUserFromRequest(req);
 
-    if (!jwtInfo) {
-        throw new UnauthorizedError();
-    }
+    const { gid, uid, role } = req.body as GroupInviteRequest;
+    const notification = await inviteGroup(jwtInfo.uid, uid, gid, role);
+    res.json(notification);
+});
+
+GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {
+    const { uid } = getCurrentUserFromRequest(req);
 
     const { name, description } = req.body as CreateGroupRequest;
 
@@ -35,7 +37,7 @@ GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, re
             description: description ?? null,
             createTime: new Date().getTime(),
         },
-        jwtInfo.uid,
+        uid,
     );
 
     if (group) {
@@ -46,9 +48,10 @@ GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, re
 });
 
 GroupRouter.delete('/:gid', async (req: Request, res: Response) => {
-    // TODO: Check Authorize
+    const { uid } = getCurrentUserFromRequest(req);
+
     const { gid } = req.params;
-    await deleteGroup(gid);
+    await deleteGroup(uid, gid);
     res.sendStatus(200);
 });
 

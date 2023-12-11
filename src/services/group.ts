@@ -6,6 +6,12 @@ import { createSession } from '../utils/mongo';
 import RoleModel from '../models/mongo/Role';
 import { Role } from '../enums/Role';
 import Member from '../models/service/Member';
+import { createNotification } from './notification';
+import { NotificationType } from '../enums/NotificationType';
+import { NotificationLevel } from '../enums/NotificationLevel';
+import { ConfirmStatus } from '../enums/ConfirmStatus';
+import { queryUserById } from './user';
+import { BadRequestError, ForbiddenError } from '../utils/response';
 
 export async function createGroup(group: Group, owner: string): Promise<Group | null> {
     const { startSession, addTransaction, concatTransaction } = await createSession();
@@ -95,7 +101,12 @@ export async function queryMemberByGid(gidList: string[]): Promise<Member[]> {
     return members;
 }
 
-export async function deleteGroup(gid: string): Promise<void> {
+export async function deleteGroup(uid: string, gid: string): Promise<void> {
+    const group = await queryGroupById(gid, { withMember: true });
+    if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
+        throw new ForbiddenError();
+    }
+
     const { startSession, addTransaction } = await createSession();
 
     const groupTransaction = async (session: ClientSession) => await GroupModel.findByIdAndDelete(gid, { session }).exec();
@@ -105,4 +116,47 @@ export async function deleteGroup(gid: string): Promise<void> {
     addTransaction(memberTransaction);
 
     await startSession();
+}
+
+export async function inviteGroup(from: string, to: string, gid: string, level: Role) {
+    const group = await queryGroupById(gid, { withMember: true });
+    if (!group) {
+        throw new BadRequestError('Group not found');
+    }
+
+    if (
+        !group.member ||
+        !group.member.length ||
+        !group.member.filter((member) => member.uid === from && (member.role === Role.Owner || member.role === Role.Manager)).length
+    ) {
+        throw new ForbiddenError();
+    }
+
+    const fromUser = await queryUserById(from);
+    if (!fromUser) {
+        throw new BadRequestError('User(from) not found');
+    }
+
+    const toUser = await queryUserById(to);
+    if (!toUser) {
+        throw new BadRequestError('User(to) not found');
+    }
+
+    if (group.member.filter((member) => member.uid === to).length) {
+        throw new BadRequestError('User already in group');
+    }
+
+    // TODO: invite to owner or manager
+    const notification = await createNotification({
+        type: NotificationType.GroupInvite,
+        from,
+        fromLevel: NotificationLevel.User,
+        to,
+        status: ConfirmStatus.Pending,
+        target: gid,
+        touched: false,
+        createTime: new Date().getTime(),
+    });
+
+    return notification;
 }
