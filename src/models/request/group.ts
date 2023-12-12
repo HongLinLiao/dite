@@ -9,9 +9,3 @@ export class CreateGroupRequest {
     @IsString()
     description?: string;
 }
-
-export class SearchGroupRequest {
-    @IsString()
-    @IsNotEmpty()
-    keyword: string;
-}

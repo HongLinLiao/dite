@@ -86,21 +86,18 @@ export async function queryGroupByUid(uid: string, options?: { withMember?: bool
     return userGroup;
 }
 
-export async function searchGroup(keyword: string, options: { withMember: boolean } = { withMember: true }): Promise<Group[]> {
+export async function searchGroup(keyword: string, options?: { withMember?: boolean }): Promise<Group[]> {
     // TODO: Change to mongo util function
     const groupSearch = await GroupModel.find({
         $or: [{ name: { $regex: keyword, $options: 'i' } }, { description: { $regex: keyword, $options: 'i' } }],
     }).exec();
     const groups = groupSearch.map((x) => Group.toServiceModel(x));
 
-    if (groups.length && options.withMember) {
+    if (groups.length && options && options.withMember) {
         const groupIds = groups.map((x) => x.id) as string[];
         const memberList = await queryMemberByGid(groupIds);
         for (const group of groups) {
-            const members = memberList.filter((x) => x.gid === group.id);
-            if (members.length) {
-                group.member = members;
-            }
+            group.member = memberList.filter((x) => x.gid === group.id);
         }
     }
 

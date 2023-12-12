@@ -2,15 +2,19 @@ import { Router, Request, Response } from 'express';
 
 import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup } from '../services/group';
 import BodyValidator from '../middlewares/BodyValidator';
-import { CreateGroupRequest, SearchGroupRequest } from '../models/request/group';
+import { CreateGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
 
 const GroupRouter = Router();
 
-GroupRouter.get('/search', BodyValidator(SearchGroupRequest), async (req: Request, res: Response) => {
-    const { keyword } = req.body as SearchGroupRequest;
-    // TODO: query string
-    const groups = await searchGroup(keyword, { withMember: true });
+GroupRouter.get('/search', async (req: Request, res: Response) => {
+    const keyword = req.query.keyword as string;
+
+    if (!keyword) {
+        return res.json([]);
+    }
+
+    const groups = await searchGroup(keyword);
     res.json(groups);
 });
 
