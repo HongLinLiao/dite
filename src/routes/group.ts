@@ -4,7 +4,6 @@ import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup 
 import BodyValidator from '../middlewares/BodyValidator';
 import { CreateGroupRequest, SearchGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
-import { InternalServerError } from '../utils/response';
 
 const GroupRouter = Router();
 
@@ -14,14 +13,14 @@ GroupRouter.get('/search', BodyValidator(SearchGroupRequest), async (req: Reques
     res.json(groups);
 });
 
-GroupRouter.get('/', async (req: Request, res: Response) => {
+GroupRouter.get('/my', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
-    res.json(await queryGroupByUid(uid));
+    res.json(await queryGroupByUid(uid, { withMember: true }));
 });
 
 GroupRouter.get('/:gid', async (req: Request, res: Response) => {
     const { gid } = req.params;
-    res.json(await queryGroupById(gid));
+    res.json(await queryGroupById(gid, { withMember: true }));
 });
 
 GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {

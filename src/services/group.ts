@@ -47,7 +47,7 @@ export async function createGroup(group: Group, owner: string): Promise<Group> {
     await startSession();
 
     if (groupId) {
-        const queryGroup = await queryGroupById(groupId);
+        const queryGroup = await queryGroupById(groupId, { withMember: true });
         if (queryGroup) {
             return queryGroup;
         }
@@ -56,15 +56,12 @@ export async function createGroup(group: Group, owner: string): Promise<Group> {
     throw new Error('Create group error');
 }
 
-export async function queryGroupById(gid: string, options: { withMember: boolean } = { withMember: true }): Promise<Group | null> {
+export async function queryGroupById(gid: string, options?: { withMember?: boolean }): Promise<Group | null> {
     const groupSearch = await GroupModel.findById(gid).exec();
     const group = groupSearch && Group.toServiceModel(groupSearch);
 
-    if (group && options.withMember) {
-        const members = await queryMemberByGid([gid]);
-        if (members) {
-            Group.setMember(group, members);
-        }
+    if (group && options && options.withMember) {
+        group.member = await queryMemberByGid([gid]);
     }
 
     return group;
