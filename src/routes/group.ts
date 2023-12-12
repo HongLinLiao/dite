@@ -38,11 +38,7 @@ GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, re
         uid,
     );
 
-    if (group) {
-        res.json(group);
-    } else {
-        throw new InternalServerError('Create group error');
-    }
+    res.json(group);
 });
 
 GroupRouter.delete('/:gid', async (req: Request, res: Response) => {

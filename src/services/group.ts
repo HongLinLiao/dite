@@ -13,7 +13,7 @@ import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { queryUserById } from './user';
 import { BadRequestError, ForbiddenError } from '../utils/response';
 
-export async function createGroup(group: Group, owner: string): Promise<Group | null> {
+export async function createGroup(group: Group, owner: string): Promise<Group> {
     const { startSession, addTransaction, concatTransaction } = await createSession();
 
     // TODO: Transaction deliver data
@@ -46,12 +46,14 @@ export async function createGroup(group: Group, owner: string): Promise<Group | 
 
     await startSession();
 
-    let createData: Group | null = null;
     if (groupId) {
-        createData = await queryGroupById(groupId);
+        const queryGroup = await queryGroupById(groupId);
+        if (queryGroup) {
+            return queryGroup;
+        }
     }
 
-    return createData;
+    throw new Error('Create group error');
 }
 
 export async function queryGroupById(gid: string, options: { withMember: boolean } = { withMember: true }): Promise<Group | null> {
