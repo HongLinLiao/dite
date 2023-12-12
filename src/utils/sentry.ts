@@ -3,7 +3,6 @@ import { ProfilingIntegration } from '@sentry/profiling-node';
 import { Express } from 'express';
 
 import env from './env';
-import { InternalServerError } from './response';
 
 export function initSentry(app: Express) {
     const { environment, sentryUri } = env;
@@ -37,6 +36,6 @@ export function initSentry(app: Express) {
     app.use(Sentry.Handlers.errorHandler());
 
     app.get('/debug-sentry', function mainHandler() {
-        throw new InternalServerError('Test sentry error');
+        throw new Error('Test sentry error');
     });
 }
