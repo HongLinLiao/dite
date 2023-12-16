@@ -20,7 +20,7 @@ GroupRouter.get('/search', async (req: Request, res: Response) => {
     res.json(groups);
 });
 
-GroupRouter.get('/my', async (req: Request, res: Response) => {
+GroupRouter.get('/', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
     const withMember = (req.query.member as string)?.isTruthy();
 
