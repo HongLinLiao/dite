@@ -1,13 +1,13 @@
 import LungModel from '../models/mongo/Lung';
+import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 import Lung from '../models/service/Lung';
-import { BadRequestError } from '../utils/response';
 import { queryUserById } from './user';
 
 export async function createLung(lung: Lung) {
     const user = await queryUserById(lung.uid);
 
     if (!user) {
-        throw new BadRequestError('User not exist');
+        throw new UserNotFoundError('User not found');
     }
 
     const newLung = await new LungModel({

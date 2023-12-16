@@ -11,8 +11,11 @@ import { NotificationType } from '../enums/NotificationType';
 import { NotificationLevel } from '../enums/NotificationLevel';
 import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { queryUserById } from './user';
-import { BadRequestError, ForbiddenError } from '../utils/response';
-import CreateGroupError from '../models/service-error/group/CreateGroupError';
+import { CreateGroupError } from '../models/service-error/group/CreateGroupError';
+import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
+import { InviteGroupError } from '../models/service-error/group/InviteGroupError';
+import { GroupNotFoundError } from '../models/service-error/group/GroupNotFoundError';
+import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 
 export async function createGroup(group: Group, owner: string): Promise<Group> {
     const { startSession, addTransaction, concatTransaction } = await createSession();
@@ -120,7 +123,7 @@ export async function queryMemberByGid(gidList: string[]): Promise<Member[]> {
 export async function deleteGroup(uid: string, gid: string): Promise<void> {
     const group = await queryGroupById(gid, { withMember: true });
     if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
-        throw new ForbiddenError();
+        throw new GroupPermissionError('User has not permission to delete group');
     }
 
     const { startSession, addTransaction } = await createSession();
@@ -135,9 +138,19 @@ export async function deleteGroup(uid: string, gid: string): Promise<void> {
 }
 
 export async function inviteGroup(from: string, to: string, gid: string, level: Role) {
+    const fromUser = await queryUserById(from);
+    if (!fromUser) {
+        throw new UserNotFoundError(`User ${from} not found`);
+    }
+
+    const toUser = await queryUserById(from);
+    if (!toUser) {
+        throw new UserNotFoundError(`User ${from} not found`);
+    }
+
     const group = await queryGroupById(gid, { withMember: true });
     if (!group) {
-        throw new BadRequestError('Group not found');
+        throw new GroupNotFoundError('Group not found');
     }
 
     if (
@@ -145,21 +158,11 @@ export async function inviteGroup(from: string, to: string, gid: string, level: 
         !group.member.length ||
         !group.member.filter((member) => member.uid === from && (member.role === Role.Owner || member.role === Role.Manager)).length
     ) {
-        throw new ForbiddenError();
-    }
-
-    const fromUser = await queryUserById(from);
-    if (!fromUser) {
-        throw new BadRequestError('User(from) not found');
-    }
-
-    const toUser = await queryUserById(to);
-    if (!toUser) {
-        throw new BadRequestError('User(to) not found');
+        throw new GroupPermissionError('User has no permission to invite others into group');
     }
 
     if (group.member.filter((member) => member.uid === to).length) {
-        throw new BadRequestError('User already in group');
+        throw new InviteGroupError('User already in group');
     }
 
     // TODO: invite to owner or manager

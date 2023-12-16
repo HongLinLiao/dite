@@ -4,6 +4,8 @@ import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup 
 import BodyValidator from '../middlewares/BodyValidator';
 import { CreateGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
+import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
+import { ForbiddenError } from '../utils/response';
 
 const GroupRouter = Router();
 
@@ -51,7 +53,16 @@ GroupRouter.delete('/:gid', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
 
     const { gid } = req.params;
-    await deleteGroup(uid, gid);
+
+    try {
+        await deleteGroup(uid, gid);
+    } catch (e) {
+        if (e instanceof GroupPermissionError) {
+            throw new ForbiddenError(e.message);
+        }
+        throw e;
+    }
+
     res.sendStatus(200);
 });
 

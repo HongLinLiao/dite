@@ -1,7 +1,8 @@
 import { LoginType } from '../enums/LoginType';
+import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
+import { LineServiceError } from '../models/service-error/util/LineServiceError';
 import { JwtField, ThirdPartyJwtInfo, issueToken, verifyToken } from '../utils/jwt';
 import { getOAuthEndpoint, getToken, getUserProfile, verifyIdToken } from '../utils/line';
-import { BadRequestError } from '../utils/response';
 import { createUser, queryUserByThirdParty, updateUserById } from './user';
 
 export async function lineLogin(code: string): Promise<ThirdPartyJwtInfo> {
@@ -9,7 +10,7 @@ export async function lineLogin(code: string): Promise<ThirdPartyJwtInfo> {
     const profile = await getUserProfile(tokenData.access_token);
 
     if (!tokenData.id_token) {
-        throw new BadRequestError('LINE id token not found');
+        throw new LineServiceError('LINE id token not found');
     }
 
     const jwtInfo = await verifyIdToken(tokenData.id_token);
@@ -56,7 +57,7 @@ export async function login(thirdPartyInfo: ThirdPartyJwtInfo): Promise<string> 
         if (diff) {
             const newUser = await updateUserById(user);
             if (!newUser) {
-                throw new BadRequestError('User not exist');
+                throw new UserNotFoundError('User not found');
             } else {
                 user = newUser;
             }
