@@ -22,14 +22,16 @@ GroupRouter.get('/search', async (req: Request, res: Response) => {
 
 GroupRouter.get('/my', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
-    // TODO: query string
-    res.json(await queryGroupByUid(uid, { withMember: true }));
+    const withMember = (req.query.member as string)?.isTruthy();
+
+    res.json(await queryGroupByUid(uid, { withMember }));
 });
 
 GroupRouter.get('/:gid', async (req: Request, res: Response) => {
     const { gid } = req.params;
-    // TODO: query string
-    res.json(await queryGroupById(gid, { withMember: true }));
+    const withMember = (req.query.member as string)?.isTruthy();
+
+    res.json(await queryGroupById(gid, { withMember }));
 });
 
 GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {
