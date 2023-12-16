@@ -17,8 +17,4 @@ export default class Group {
             createTime: group.createTime,
         };
     }
-
-    static setMember(group: Group, members: IRole[]): void {
-        group.member = members.map((member) => Member.toServiceModel(member));
-    }
 }

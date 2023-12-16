@@ -30,12 +30,3 @@ export class ForbiddenError extends Error implements ResponseError {
         super(message);
     }
 }
-
-export class InternalServerError extends Error implements ResponseError {
-    public name: string = 'InternalServerError';
-    public status: number = 500;
-
-    constructor(message: string = 'Internal Server Error') {
-        super(message);
-    }
-}

@@ -2,26 +2,36 @@ import { Router, Request, Response } from 'express';
 
 import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup } from '../services/group';
 import BodyValidator from '../middlewares/BodyValidator';
-import { CreateGroupRequest, SearchGroupRequest } from '../models/request/group';
+import { CreateGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
-import { InternalServerError } from '../utils/response';
+import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
+import { ForbiddenError } from '../utils/response';
 
 const GroupRouter = Router();
 
-GroupRouter.get('/search', BodyValidator(SearchGroupRequest), async (req: Request, res: Response) => {
-    const { keyword } = req.body as SearchGroupRequest;
-    const groups = await searchGroup(keyword, { withMember: true });
+GroupRouter.get('/search', async (req: Request, res: Response) => {
+    const keyword = req.query.keyword as string;
+
+    if (!keyword) {
+        return res.json([]);
+    }
+
+    const groups = await searchGroup(keyword);
     res.json(groups);
 });
 
 GroupRouter.get('/', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
-    res.json(await queryGroupByUid(uid));
+    const withMember = (req.query.member as string)?.isTruthy();
+
+    res.json(await queryGroupByUid(uid, { withMember }));
 });
 
 GroupRouter.get('/:gid', async (req: Request, res: Response) => {
     const { gid } = req.params;
-    res.json(await queryGroupById(gid));
+    const withMember = (req.query.member as string)?.isTruthy();
+
+    res.json(await queryGroupById(gid, { withMember }));
 });
 
 GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, res: Response) => {
@@ -38,18 +48,23 @@ GroupRouter.post('/', BodyValidator(CreateGroupRequest), async (req: Request, re
         uid,
     );
 
-    if (group) {
-        res.json(group);
-    } else {
-        throw new InternalServerError('Create group error');
-    }
+    res.json(group);
 });
 
 GroupRouter.delete('/:gid', async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
 
     const { gid } = req.params;
-    await deleteGroup(uid, gid);
+
+    try {
+        await deleteGroup(uid, gid);
+    } catch (e) {
+        if (e instanceof GroupPermissionError) {
+            throw new ForbiddenError(e.message);
+        }
+        throw e;
+    }
+
     res.sendStatus(200);
 });
 

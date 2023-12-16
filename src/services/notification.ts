@@ -1,6 +1,6 @@
 import NotificationModel from '../models/mongo/Notification';
+import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 import Notification from '../models/service/Notification';
-import { BadRequestError } from '../utils/response';
 import { queryUserById } from './user';
 
 export async function createNotification(notification: Notification) {
@@ -21,7 +21,7 @@ export async function createNotification(notification: Notification) {
 export async function getUserNotifications(uid: string): Promise<Notification[]> {
     const user = await queryUserById(uid);
     if (!user) {
-        throw new BadRequestError('User not found');
+        throw new UserNotFoundError('User not found');
     }
 
     const notifySearch = await NotificationModel.find({ to: uid }).exec();

@@ -11,6 +11,7 @@ import NotifyRouter from './routes/notify';
 import ErrorMiddleware from './middlewares/Error';
 import AuthMiddleware from './middlewares/Auth';
 import { initSentry } from './utils/sentry';
+import './prototypes/string';
 
 const port = env.port;
 const app: Express = express();
