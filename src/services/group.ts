@@ -12,6 +12,7 @@ import { NotificationLevel } from '../enums/NotificationLevel';
 import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { queryUserById } from './user';
 import { BadRequestError, ForbiddenError } from '../utils/response';
+import CreateGroupError from '../models/service-error/group/CreateGroupError';
 
 export async function createGroup(group: Group, owner: string): Promise<Group> {
     const { startSession, addTransaction, concatTransaction } = await createSession();
@@ -53,7 +54,7 @@ export async function createGroup(group: Group, owner: string): Promise<Group> {
         }
     }
 
-    throw new Error('Create group error');
+    throw new CreateGroupError(`Can not find created group with gid ${groupId}`);
 }
 
 export async function queryGroupById(gid: string, options?: { withMember?: boolean }): Promise<Group | null> {
