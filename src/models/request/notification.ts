@@ -1,6 +1,7 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, isBoolean } from 'class-validator';
 
 import { Role } from '../../enums/Role';
+import { ConfirmStatus } from '../../enums/ConfirmStatus';
 
 export class GroupInviteRequest {
     @IsString()
@@ -13,4 +14,10 @@ export class GroupInviteRequest {
 
     @IsEnum(Role)
     role: Role;
+}
+
+export class NotificationUpdateRequest {
+    @IsEnum(ConfirmStatus)
+    @IsOptional()
+    confirmStatus: ConfirmStatus;
 }
