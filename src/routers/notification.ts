@@ -5,14 +5,16 @@ import { GroupInviteRequest, NotificationUpdateRequest } from '../models/request
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
 import { inviteGroup } from '../services/group';
 import { getUserNotifications, updateNotification } from '../services/notification';
-import { GroupNotFoundError } from '../models/service-error/group/GroupNotFoundError';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
-import { InviteGroupError } from '../models/service-error/group/InviteGroupError';
 import { BadRequestError, ForbiddenError } from '../utils/response';
-import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
-import { NotificationPermissionError } from '../models/service-error/notification/NotificationPermissionError';
-import { NotificationNotFoundError } from '../models/service-error/notification/NotificationNotFoundError';
-import { UpdateNotificationError } from '../models/service-error/notification/UpdateNotificationError';
+import {
+    GroupNotFoundError,
+    GroupPermissionError,
+    InviteGroupError,
+    NotificationNotFoundError,
+    NotificationPermissionError,
+    UpdateNotificationError,
+    UserNotFoundError,
+} from '../models/service-error';
 
 export const NotificationRouter = Router();
 

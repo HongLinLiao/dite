@@ -11,16 +11,18 @@ import { NotificationType } from '../enums/NotificationType';
 import { NotificationLevel } from '../enums/NotificationLevel';
 import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { queryUserById } from './user';
-import { CreateGroupError } from '../models/service-error/group/CreateGroupError';
-import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
-import { InviteGroupError } from '../models/service-error/group/InviteGroupError';
-import { GroupNotFoundError } from '../models/service-error/group/GroupNotFoundError';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 import Notification from '../models/service/Notification';
-import { NotificationNotFoundError } from '../models/service-error/notification/NotificationNotFoundError';
-import { NotificationPermissionError } from '../models/service-error/notification/NotificationPermissionError';
-import { UpdateNotificationError } from '../models/service-error/notification/UpdateNotificationError';
 import NotificationModel from '../models/mongo/Notification';
+import {
+    CreateGroupError,
+    GroupNotFoundError,
+    GroupPermissionError,
+    InviteGroupError,
+    NotificationNotFoundError,
+    NotificationPermissionError,
+    UpdateNotificationError,
+    UserNotFoundError,
+} from '../models/service-error';
 
 export async function createGroup(group: Group, owner: string): Promise<Group> {
     const { startSession, addTransaction, concatTransaction } = await createSession();

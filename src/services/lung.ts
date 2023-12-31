@@ -1,5 +1,5 @@
 import LungModel from '../models/mongo/Lung';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
+import { UserNotFoundError } from '../models/service-error';
 import Lung from '../models/service/Lung';
 import { queryUserById } from './user';
 

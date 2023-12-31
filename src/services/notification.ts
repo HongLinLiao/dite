@@ -1,9 +1,7 @@
 import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { NotificationType } from '../enums/NotificationType';
 import NotificationModel from '../models/mongo/Notification';
-import { NotificationNotFoundError } from '../models/service-error/notification/NotificationNotFoundError';
-import { UpdateNotificationError } from '../models/service-error/notification/UpdateNotificationError';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
+import { NotificationNotFoundError, UpdateNotificationError, UserNotFoundError } from '../models/service-error';
 import Notification from '../models/service/Notification';
 import { confirmGroupInvitation } from './group';
 import { queryUserById } from './user';

@@ -4,8 +4,8 @@ import { createGroup, deleteGroup, queryGroupById, queryGroupByUid, searchGroup 
 import BodyValidator from '../middlewares/BodyValidator';
 import { CreateGroupRequest } from '../models/request/group';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
-import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
 import { ForbiddenError } from '../utils/response';
+import { GroupPermissionError } from '../models/service-error';
 
 export const GroupRouter = Router();
 

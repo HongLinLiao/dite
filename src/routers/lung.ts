@@ -4,8 +4,8 @@ import { createLung, queryLungByUid } from '../services/lung';
 import { CreateLungRequest } from '../models/request/lung';
 import BodyValidator from '../middlewares/BodyValidator';
 import { getCurrentUserFromRequest } from '../middlewares/Auth';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 import { BadRequestError } from '../utils/response';
+import { UserNotFoundError } from '../models/service-error';
 
 export const LungRouter = Router();
 
