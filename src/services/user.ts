@@ -26,6 +26,6 @@ export async function createUser(user: User) {
 }
 
 export async function updateUserById(user: User) {
-    const newUser = await UserModel.findByIdAndUpdate(user.id, user).exec();
+    const newUser = await UserModel.findByIdAndUpdate(user.id, user, { new: true }).exec();
     return newUser && User.toServiceModel(newUser);
 }

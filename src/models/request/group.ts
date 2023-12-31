@@ -9,3 +9,13 @@ export class CreateGroupRequest {
     @IsString()
     description?: string;
 }
+
+export class GroupUpdateRequest {
+    @IsString()
+    @IsOptional()
+    name?: string;
+
+    @IsString()
+    @IsOptional()
+    description?: string;
+}

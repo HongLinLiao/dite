@@ -17,6 +17,7 @@ import {
     CreateGroupError,
     GroupNotFoundError,
     GroupPermissionError,
+    GroupUpdateError,
     InviteGroupError,
     NotificationNotFoundError,
     NotificationPermissionError,
@@ -127,6 +128,32 @@ export async function queryMemberByGid(gidList: string[]): Promise<Member[]> {
     return members;
 }
 
+export async function updateGroup(gid: string, uid: string, data: { name?: string; description?: string }): Promise<Group> {
+    const group = await queryGroupById(gid, { withMember: true });
+    if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
+        throw new GroupPermissionError('User has not permission to edit group');
+    }
+
+    if (!data.name && !data.description) {
+        throw new GroupUpdateError('Invalid update data');
+    }
+
+    if (data.name) {
+        group.name = data.name;
+    }
+
+    if (data.description) {
+        group.description = data.description;
+    }
+
+    const findGroup = await GroupModel.findByIdAndUpdate(gid, group, { new: true }).exec();
+    if (!findGroup) {
+        throw new GroupNotFoundError('Group not found');
+    }
+
+    return Group.toServiceModel(findGroup);
+}
+
 export async function deleteGroup(uid: string, gid: string): Promise<void> {
     const group = await queryGroupById(gid, { withMember: true });
     if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
@@ -229,7 +256,7 @@ export async function confirmGroupInvitation(notificationId: string, uid: string
     }
 
     const updateNotification = async (session: ClientSession) =>
-        await NotificationModel.findByIdAndUpdate(notificationId, notificationParams, { session }).exec();
+        await NotificationModel.findByIdAndUpdate(notificationId, notificationParams, { session, new: true }).exec();
 
     addTransaction(updateNotification);
 
