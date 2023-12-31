@@ -1,15 +1,15 @@
 import { Router, Request, Response } from 'express';
 
-import { getLineEndpoint, lineLogin, login } from '../services/auth';
+import { getLineEndpoint, lineLogin, login } from '../services/session';
 import { LoginType } from '../enums/LoginType';
 import AuthMiddleware from '../middlewares/Auth';
 import { BadRequestError } from '../utils/response';
-import { SignInRequest } from '../models/request/auth';
+import { SignInRequest } from '../models/request/session';
 import BodyValidator from '../middlewares/BodyValidator';
 
-const AuthRouter = Router();
+export const SessionRouter = Router();
 
-AuthRouter.post('/signIn', BodyValidator(SignInRequest), async (req: Request, res: Response) => {
+SessionRouter.post('/new', BodyValidator(SignInRequest), async (req: Request, res: Response) => {
     const { code, loginType } = req.body;
 
     switch (loginType) {
@@ -25,13 +25,11 @@ AuthRouter.post('/signIn', BodyValidator(SignInRequest), async (req: Request, re
     }
 });
 
-AuthRouter.post('/', AuthMiddleware, async (req: Request, res: Response) => {
+SessionRouter.post('/', AuthMiddleware, async (req: Request, res: Response) => {
     // TODO: refresh token or assign new token
     res.sendStatus(200);
 });
 
-AuthRouter.get('/line/endpoint', (req: Request, res: Response) => {
+SessionRouter.get('/endpoint/line', (req: Request, res: Response) => {
     res.send(getLineEndpoint());
 });
-
-export default AuthRouter;

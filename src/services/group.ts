@@ -6,16 +6,24 @@ import { createSession } from '../utils/mongo';
 import RoleModel from '../models/mongo/Role';
 import { Role } from '../enums/Role';
 import Member from '../models/service/Member';
-import { createNotification } from './notification';
+import { createNotification, queryNotification } from './notification';
 import { NotificationType } from '../enums/NotificationType';
 import { NotificationLevel } from '../enums/NotificationLevel';
 import { ConfirmStatus } from '../enums/ConfirmStatus';
 import { queryUserById } from './user';
-import { CreateGroupError } from '../models/service-error/group/CreateGroupError';
-import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
-import { InviteGroupError } from '../models/service-error/group/InviteGroupError';
-import { GroupNotFoundError } from '../models/service-error/group/GroupNotFoundError';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
+import Notification from '../models/service/Notification';
+import NotificationModel from '../models/mongo/Notification';
+import {
+    CreateGroupError,
+    GroupNotFoundError,
+    GroupPermissionError,
+    GroupUpdateError,
+    InviteGroupError,
+    NotificationNotFoundError,
+    NotificationPermissionError,
+    UpdateNotificationError,
+    UserNotFoundError,
+} from '../models/service-error';
 
 export async function createGroup(group: Group, owner: string): Promise<Group> {
     const { startSession, addTransaction, concatTransaction } = await createSession();
@@ -120,6 +128,32 @@ export async function queryMemberByGid(gidList: string[]): Promise<Member[]> {
     return members;
 }
 
+export async function updateGroup(gid: string, uid: string, data: { name?: string; description?: string }): Promise<Group> {
+    const group = await queryGroupById(gid, { withMember: true });
+    if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
+        throw new GroupPermissionError('User has not permission to edit group');
+    }
+
+    if (!data.name && !data.description) {
+        throw new GroupUpdateError('Invalid update data');
+    }
+
+    if (data.name) {
+        group.name = data.name;
+    }
+
+    if (data.description) {
+        group.description = data.description;
+    }
+
+    const findGroup = await GroupModel.findByIdAndUpdate(gid, group, { new: true }).exec();
+    if (!findGroup) {
+        throw new GroupNotFoundError('Group not found');
+    }
+
+    return Group.toServiceModel(findGroup);
+}
+
 export async function deleteGroup(uid: string, gid: string): Promise<void> {
     const group = await queryGroupById(gid, { withMember: true });
     if (!group || !group.member || !group.member.filter((x) => x.uid === uid && x.role === Role.Owner).length) {
@@ -137,7 +171,7 @@ export async function deleteGroup(uid: string, gid: string): Promise<void> {
     await startSession();
 }
 
-export async function inviteGroup(from: string, to: string, gid: string, level: Role) {
+export async function inviteGroup(from: string, to: string, gid: string, level: Role): Promise<Notification> {
     const fromUser = await queryUserById(from);
     if (!fromUser) {
         throw new UserNotFoundError(`User ${from} not found`);
@@ -178,4 +212,60 @@ export async function inviteGroup(from: string, to: string, gid: string, level: 
     });
 
     return notification;
+}
+
+export async function confirmGroupInvitation(notificationId: string, uid: string, confirmStatus?: ConfirmStatus): Promise<Notification> {
+    const notification = await queryNotification(notificationId);
+
+    if (!notification) {
+        throw new NotificationNotFoundError('Notification not found');
+    }
+
+    if (notification.to !== uid) {
+        throw new NotificationPermissionError(`User has no permission to operate the notification`);
+    }
+
+    if (confirmStatus === ConfirmStatus.None || confirmStatus === ConfirmStatus.Pending) {
+        throw new UpdateNotificationError(`Invalid confirm status`);
+    }
+
+    if (notification.status !== ConfirmStatus.Pending) {
+        throw new UpdateNotificationError(`Notification was confirmed before`);
+    }
+
+    const notificationParams = { ...notification, touched: true };
+    if (confirmStatus) {
+        notificationParams.status = confirmStatus;
+    }
+
+    const { addTransaction, startSession } = await createSession();
+
+    if (confirmStatus === ConfirmStatus.Confirm) {
+        const searchRole = await RoleModel.findOne({ uid, gid: notification.target }).exec();
+        if (!searchRole) {
+            const createRole = async (session: ClientSession) => {
+                return await new RoleModel({
+                    gid: notification.target,
+                    uid: notification.to,
+                    role: Role.Member,
+                    createTime: new Date().getTime(),
+                }).save({ session });
+            };
+            addTransaction(createRole);
+        }
+    }
+
+    const updateNotification = async (session: ClientSession) =>
+        await NotificationModel.findByIdAndUpdate(notificationId, notificationParams, { session, new: true }).exec();
+
+    addTransaction(updateNotification);
+
+    await startSession();
+
+    const searchNotification = await queryNotification(notificationId);
+    if (!searchNotification) {
+        throw new NotificationNotFoundError('Notification not found');
+    }
+
+    return searchNotification;
 }

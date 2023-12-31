@@ -1,6 +1,5 @@
 import { LoginType } from '../enums/LoginType';
-import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
-import { LineServiceError } from '../models/service-error/util/LineServiceError';
+import { LineServiceError, UserNotFoundError } from '../models/service-error';
 import { JwtField, ThirdPartyJwtInfo, issueToken, verifyToken } from '../utils/jwt';
 import { getOAuthEndpoint, getToken, getUserProfile, verifyIdToken } from '../utils/line';
 import { createUser, queryUserByThirdParty, updateUserById } from './user';
