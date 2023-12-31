@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { authentication as verify } from '../services/auth';
+import { authentication as verify } from '../services/session';
 import { UnauthorizedError } from '../utils/response';
 
 export default function AuthMiddleware(req: Request, res: Response, next: NextFunction) {

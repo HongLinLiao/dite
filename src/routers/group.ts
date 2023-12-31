@@ -7,7 +7,7 @@ import { getCurrentUserFromRequest } from '../middlewares/Auth';
 import { GroupPermissionError } from '../models/service-error/group/GroupPermissionError';
 import { ForbiddenError } from '../utils/response';
 
-const GroupRouter = Router();
+export const GroupRouter = Router();
 
 GroupRouter.get('/search', async (req: Request, res: Response) => {
     const keyword = req.query.keyword as string;
@@ -67,5 +67,3 @@ GroupRouter.delete('/:gid', async (req: Request, res: Response) => {
 
     res.sendStatus(200);
 });
-
-export default GroupRouter;

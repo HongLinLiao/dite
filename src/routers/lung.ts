@@ -7,7 +7,12 @@ import { getCurrentUserFromRequest } from '../middlewares/Auth';
 import { UserNotFoundError } from '../models/service-error/user/UserNotFoundError';
 import { BadRequestError } from '../utils/response';
 
-const LungRouter = Router();
+export const LungRouter = Router();
+
+LungRouter.get('/', async (req: Request, res: Response) => {
+    const { uid } = getCurrentUserFromRequest(req);
+    res.json(await queryLungByUid(uid));
+});
 
 LungRouter.post('/', BodyValidator(CreateLungRequest), async (req: Request, res: Response) => {
     const { uid } = getCurrentUserFromRequest(req);
@@ -31,10 +36,3 @@ LungRouter.post('/', BodyValidator(CreateLungRequest), async (req: Request, res:
         throw e;
     }
 });
-
-LungRouter.get('/', async (req: Request, res: Response) => {
-    const { uid } = getCurrentUserFromRequest(req);
-    res.json(await queryLungByUid(uid));
-});
-
-export default LungRouter;
